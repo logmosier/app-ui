@@ -13,7 +13,7 @@ const defaultFetchOpts = {
 
 const ServerAPI = {
   getGraphAndLayout(uri, version) {
-    return fetch(`/api/get-graph-and-layout?${qs.stringify({uri, version})}`, defaultFetchOpts).then(res =>  res.json());
+    return fetch(`/api/get-graph-and-layout?${qs.stringify({uri, version})}`, defaultFetchOpts).then(res => res.json());
   },
 
   pcQuery(method, params){
@@ -41,7 +41,9 @@ const ServerAPI = {
   getProteinInformation(uniprotId){
     return fetch(`https://www.ebi.ac.uk/proteins/api/proteins?offset=0&size=1&accession=${uniprotId}`,defaultFetchOpts).then(res => res.json());
   },
-
+  getNeighbors(uniprotId){
+    return fetch(`http://www.pathwaycommons.org/pc2/graph?source=http://identifiers.org/uniprot/${uniprotId}&kind=neighborhood&format=TXT`,defaultFetchOpts).then(res => res.text());
+  },
   // Send a diff in a node to the backend. The backend will deal with merging these diffs into
   // a layout
   submitNodeChange(uri, version, nodeId, bbox) {

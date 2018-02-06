@@ -38,6 +38,19 @@ module.exports = () => {
         render: props => h(Features.Paint, props)
       },
       {
+        path: '/interactions',
+        render: props => {
+          const editProps = _.assign({}, props, {
+            interactions: true
+          });
+          return h(Features.Interactions, editProps);
+        }
+      },
+      {
+        path: '/uniprot',
+        render: props => h(Features.Search, props)
+      },
+      {
         path: '/edit',
         render: props => {
           const editProps = _.assign({}, props, {

@@ -142,7 +142,7 @@ class Search extends React.Component {
       const dsInfo =_.isEmpty(state.dataSources)? {iconUrl:null , name:''}: _.find(state.dataSources, ds => {
         return ds.uri === result.dataSource[0];
       });
-
+      
       return h('div.search-item', [
        h('div.search-item-icon',[
           h('img', {src: dsInfo.iconUrl})
@@ -214,7 +214,10 @@ class Search extends React.Component {
           ]),
           h('div.search-landing-section',[synonyms]),
           h('div.search-landing-section',[functions]),
-          h('div.search-landing-section',[links])
+          h('div.search-landing-section',[links]),
+          h(Link, { to: { pathname: '/interactions',search: queryString.stringify({ ID: box.accession })}, target: '_blank' }, [
+            h('h3.search-item-content-title', 'Interactions'),
+          ]),
         ]);    
       });
 
