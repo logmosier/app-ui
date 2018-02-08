@@ -40,6 +40,46 @@ const stylesheet = sbgnStyleSheet(cytoscape)
 .selector('edge')
 .css({
   'opacity': 0.3
+})
+.selector('edge[class="controls-phosphorylation-of"]')
+.css({
+  'line-color': 'red'
+})
+.selector('edge[class="controls-expression-of"]')
+.css({
+  'line-color': 'green'
+})
+.selector('edge[class="in-complex-with"]')
+.css({
+  'line-color': 'blue'
+})
+.selector('edge[class="interacts-with"]')
+.css({
+  'line-color': 'yellow'
+})
+.selector('edge[class="consumption-controlled-by"]')
+.css({
+  'line-color': 'darkRed'
+})
+.selector('edge[class="controls-production-of	"]')
+.css({
+  'line-color': 'darkMagenta'
+})
+.selector('edge[class="controls-transport-of-chemical"]')
+.css({
+  'line-color': 'darkGreen'
+})
+.selector('edge[class="chemical-affects"]')
+.css({
+  'line-color': 'aquamarine'
+})
+.selector('edge[class="controls-state-change-of"]')
+.css({
+  'line-color': 'MediumVioletRed '
+})
+.selector('edge[class="neighbor-of"]')
+.css({
+  'line-color': 'purple'
 });
 
 module.exports = stylesheet;

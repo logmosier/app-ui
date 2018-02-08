@@ -13,7 +13,7 @@ Optional
 class FlatButton extends React.Component {
   render() {
     const props = this.props;
-
+    
     let textContent = [h('span', props.children)];
     let contents = textContent;
 
@@ -26,7 +26,7 @@ class FlatButton extends React.Component {
     }
 
     return h('div.common-flat-button', {
-      onClick: () => props.onClick()
+      onClick: (e) => props.onClick(e)
     }, contents);
   }
 }

@@ -1,6 +1,6 @@
 const h = require('react-hyperscript');
 
-const { NetworkInfoMenu, FileDownloadMenu } = require('./menus');
+const { NetworkInfoMenu, FileDownloadMenu, InteractionsSettingsMenu } = require('./menus');
 
 let expanded = true;
 const expandCollapseAll = (props) => {
@@ -76,6 +76,10 @@ const menus = [
   {
     id: 'networkInfoMenu',
     func: props => h(NetworkInfoMenu, props),
+  },
+  {
+  id: 'interactionsSettingsMenu',
+    func: props => h(InteractionsSettingsMenu, props),
   }
 ];
 

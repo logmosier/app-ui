@@ -112,7 +112,8 @@ class BaseNetworkView extends React.Component {
             onClick: () => {
               this.changeMenu(btn.menuId);
             },
-            desc: btn.description
+            desc: btn.description,
+            cy: state.cy
           })
         ])
       );
