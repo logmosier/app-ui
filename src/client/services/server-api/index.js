@@ -41,8 +41,10 @@ const ServerAPI = {
   getProteinInformation(uniprotId){
     return fetch(`https://www.ebi.ac.uk/proteins/api/proteins?offset=0&size=1&accession=${uniprotId}`,defaultFetchOpts).then(res => res.json());
   },
-  getNeighbors(uniprotId){
-    return fetch(`http://www.pathwaycommons.org/pc2/graph?source=http://identifiers.org/uniprot/${uniprotId}&kind=neighborhood&format=TXT`,defaultFetchOpts).then(res => res.text());
+
+  getNeighborhood(uniprotId){
+    return fetch(`http://www.pathwaycommons.org/pc2/graph?source=http://identifiers.org/uniprot/${uniprotId}&kind=neighborhood&format=TXT&pattern=controls-phosphorylation-of
+    &pattern=in-complex-with&pattern=controls-expression-of&pattern=interacts-with`,defaultFetchOpts).then(res => res.text());
   },
   // Send a diff in a node to the backend. The backend will deal with merging these diffs into
   // a layout
@@ -53,7 +55,7 @@ const ServerAPI = {
       diff: {
         nodeID: nodeId,
         bbox: bbox
-      }
+      } 
     });
   },
 

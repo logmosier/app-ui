@@ -41,45 +41,34 @@ const stylesheet = sbgnStyleSheet(cytoscape)
 .css({
   'opacity': 0.3
 })
-.selector('edge[class="controls-phosphorylation-of"]')
+.selector('edge[class="Phosphorylation"]')
 .css({
   'line-color': 'red'
 })
-.selector('edge[class="controls-expression-of"]')
+.selector('edge[class="Binding"]')
 .css({
   'line-color': 'green'
 })
-.selector('edge[class="in-complex-with"]')
+.selector('edge[class="Expression"]')
 .css({
   'line-color': 'blue'
 })
-.selector('edge[class="interacts-with"]')
+.selector('node[class="ball"]')
 .css({
-  'line-color': 'yellow'
-})
-.selector('edge[class="consumption-controlled-by"]')
-.css({
-  'line-color': 'darkRed'
-})
-.selector('edge[class="controls-production-of	"]')
-.css({
-  'line-color': 'darkMagenta'
-})
-.selector('edge[class="controls-transport-of-chemical"]')
-.css({
-  'line-color': 'darkGreen'
-})
-.selector('edge[class="chemical-affects"]')
-.css({
-  'line-color': 'aquamarine'
-})
-.selector('edge[class="controls-state-change-of"]')
-.css({
-  'line-color': 'MediumVioletRed '
-})
-.selector('edge[class="neighbor-of"]')
-.css({
-  'line-color': 'purple'
+  'font-size': 20,
+  'color': 'black',
+  'text-outline-color': 'white',
+  'text-outline-width': 2,
+  'text-wrap': 'wrap',
+  'text-max-width': 175,
+  'width': 45,
+  'height': 45,
+  'label': node => {
+    const label = node.data('label')
+      .split('(').join('').split(')').join('')
+      .split(':').join(' ');
+    return label;
+  }
 });
 
 module.exports = stylesheet;
