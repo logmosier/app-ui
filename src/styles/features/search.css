@@ -242,24 +242,8 @@
   margin: 0;
 }
 
-<<<<<<< HEAD
-.search-landing-hideContent {
-  overflow: hidden;
-  vertical-align:text-bottom;
-  line-height: 1.2em;
-  max-height: 3.6em; 
-  max-width: 90%;
-  display: inline-flex;
-}
-
-.search-landing-showContent {
-  line-height: 1.2em;
-  display: inline;
-
-=======
 .search-landing-function {
  margin-right: 5px ;
->>>>>>> 4fcde7169ec4618383146a0d764307853370a26f
 }
 .search-landing-small{
   font-size: 10pt;
