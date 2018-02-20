@@ -9,10 +9,10 @@ const hideTooltips = (cy) => {
 
 const bindClick = (cy) => {
 
-  cy.on('tap', 'node,edge', evt => {
+  cy.on('tap', 'node,edge.Binding,.Phosphorylation,.Expression', evt => {
     const cy = evt.cy;
     const node = evt.target;
-
+    
     if (!node.scratch('_tooltip-opened')) {
       node.emit('showTooltip');
       node.scratch('_tooltip-opened', true);

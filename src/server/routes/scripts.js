@@ -38,7 +38,6 @@ const generatePathways = async () => {
 
   for (const uri of uris) {
     const pathwayMetadata = await getPathwayLevelMetadata(uri);
-    console.log(i, pathwayMetadata);
     i++;
     const pathway = {
       id: uri,

@@ -14,26 +14,26 @@ class InteractionsSettingsMenu extends React.Component {
   handelClick (e) {
     const saved = this.state.savedCatagories;
     if(!saved.has(e.target.textContent)){
-      const edges= this.props.cy.edges().filter(`[class="${e.target.textContent}"]`);
-      const toSave = edges.union(edges.connectedNodes());
+      const edges= this.props.cy.edges().filter(`.${e.target.textContent}`);
+      this.props.cy.remove(edges);
+      const nodes = this.props.cy.nodes().filter(node=> node.connectedEdges().length<=0);
+      const toSave = edges.union(nodes);
+      this.props.cy.remove(nodes);
       if(toSave.length){
-      this.setState({
-        savedCatagories: saved.set(e.target.textContent, toSave)
-      });
+          saved.set(e.target.textContent, toSave);
       }
-      this.props.cy.remove(toSave);
     }
     else{ 
-      this.setState({
-        savedCatagories: saved.delete(e.target.textContent)
-      });
-      this.props.cy.add(saved.get(e.target.textContent));
+      saved.get(e.target.textContent).restore();
+      saved.delete(e.target.textContent);
     }
+    this.setState({
+      savedCatagories: saved
+    });
   }
 
   render(){
-    //const handelClick=this.handelClick();
-    const buttons= ['controls-phosphorylation-of' , 'controls-expression-of','in-complex-with','interacts-with','neighbor-of','consumption-controlled-by','controls-production-of'	,'controls-transport-of-chemical','chemical-affects'
+    const buttons= ['Binding','Phosphorylation','Expression'
     ].map(but=>h(FlatButton,{children:but, onClick: (e) => this.handelClick(e),key:but}));
     return h('div',[buttons]);
     }

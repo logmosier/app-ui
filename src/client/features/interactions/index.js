@@ -28,7 +28,7 @@ class Interactions extends React.Component {
     };    
     const query = queryString.parse(props.location.search);
     ServerAPI.getNeighborhood(query.ID).then(res=>{ 
-      const layoutConfig = getLayoutConfig(null);//null to get the base layout
+      const layoutConfig = getLayoutConfig('interactions');
       const componentConfig = _.merge({}, BaseNetworkView.config, { useSearchBar: true});
       const network= this.parse(res,query.ID);
       this.setState({
@@ -61,6 +61,7 @@ class Interactions extends React.Component {
   findId(data,id){
     return data.filter(line => line.includes(id))[0].split('	')[0];
   }
+
   //Quick Function made to try and find a neighborhood with few members
   // sizecheck(data){
   //   const splitByLines=data.split('\n');
@@ -79,6 +80,30 @@ class Interactions extends React.Component {
   //   }
   // }
 
+  pathwayLinks(line){
+    return line[6].split(';').map( link => {
+      const splitLink=link.split('/').reverse();
+      return [splitLink[1]==='reactome'? 'reactome': 'Pathway Commons',splitLink[0]];
+    });
+  }
+
+  addInteraction(splitLine,network,nodeMap){
+    for (let i = 0; i<=2; i+=2){
+      if(!nodeMap.has(splitLine[i])){
+        nodeMap.set(splitLine[i],true);
+        network.nodes.push({data:{bbox:{h:15,w:15,x:7.5,y:7.5},class: "ball",clonemarker:false,id: splitLine[i],label: splitLine[i],parsedMetadata:[],stateVariables:[],unitsOfInformation:[]}});
+      }
+    }
+    network.edges.push({data: {
+      id: splitLine[0]+splitLine[1]+splitLine[2] ,
+      label:splitLine[0]+' '+splitLine[1]+' '+splitLine[2] ,
+      source:splitLine[0],
+      target: splitLine[2],
+      class: this.edgeTypeing(splitLine[1]),
+      parsedMetadata:[['Database IDs',this.pathwayLinks(splitLine)]]
+    },classes: this.edgeTypeing(splitLine[1])});
+  }
+
   parse(data,query){
     let network = {
       edges:[],
@@ -90,30 +115,22 @@ class Interactions extends React.Component {
     const splitByLines=data.split('\n');
     const id=this.findId(splitByLines,query);
 
-    for(let j= 0; j<2; j++){
-      let i=1;
-      while (splitByLines[i]){ 
-        let splitLine=splitByLines[i].split('\t');
-        if(splitLine[0]===id || splitLine[2]===id || (nodeMap.has(splitLine[0]) &&nodeMap.has(splitLine[2]))){ //if it is a interaction with the main node or 2 nodes conected to the main node
-          if(!nodeMap.has(splitLine[0])){
-            nodeMap.set(splitLine[0],true);
-            network.nodes.push({data:{bbox:{h:15,w:15,x:7.5,y:7.5},class: "ball",clonemarker:false,id: splitLine[0],label: splitLine[0],parsedMetadata:[],stateVariables:[],unitsOfInformation:[]}});
-          }
-          if(!nodeMap.has(splitLine[2])){
-            nodeMap.set(splitLine[2],true);
-            network.nodes.push({data:{bbox:{h:15,w:15,x:7.5,y:7.5},class: "ball",clonemarker:false,id: splitLine[2],label: splitLine[2],parsedMetadata:[],stateVariables:[],unitsOfInformation:[]}});
-          }
-          network.edges.push({data: {
-            id: splitLine[0]+splitLine[1]+splitLine[2] ,
-            label:splitLine[0]+' '+splitLine[1]+' '+splitLine[2] ,
-            source:splitLine[0],
-            target: splitLine[2],
-            class: this.edgeTypeing(splitLine[1]),
-            parsedMetadata:[['Database IDs',splitLine[6].split(';')]]
-          }});
-        }
-        i++;
+    let i=1;
+    while (splitByLines[i]){ 
+      let splitLine=splitByLines[i].split('\t');
+      if(splitLine[0]===id || splitLine[2]===id){ //if it is a interaction with the main node or 2 nodes conected to the main node
+        this.addInteraction(splitLine,network,nodeMap);
       }
+      i++;
+    }
+    nodeMap.delete(id);
+    i=1;
+    while (splitByLines[i]){ 
+      let splitLine=splitByLines[i].split('\t');
+      if(nodeMap.has(splitLine[0]) &&nodeMap.has(splitLine[2])){ //if it is a interaction with the main node or 2 nodes conected to the main node
+        this.addInteraction(splitLine,network,nodeMap);
+      }
+      i++;
     }
     return network;
   }
