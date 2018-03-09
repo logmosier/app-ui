@@ -38,7 +38,18 @@ const databaseHandler = (pair, expansionFunction) => {
   const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, '« less');
   if (pair[1].length < 1) { return h('div.error'); }
   return generateDatabaseList(sortByDatabaseId(pair[1]), false, expansionLink);
+};
 
+//Handle interaction/Detailed views related fields
+const interactionHandlerTrim =(pair, expansionFunction) => {
+  const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, 'more »');
+  if (pair[1].length < 1) { return h('div.error'); }
+  return generateInteractionList(sortByDatabaseId(pair[1]), true, expansionLink);
+};
+const interactionHandler =(pair, expansionFunction) => {
+  const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, '« less');
+  if (pair[1].length < 1) { return h('div.error'); }
+  return generateInteractionList(sortByDatabaseId(pair[1]), false, expansionLink);
 };
 
 //Handle publication related fields
@@ -77,7 +88,9 @@ const metaDataKeyMap = new Map()
   .set('Database IDs', databaseHandler)
   .set('Database IDsTrim', databaseHandlerTrim)
   .set('Publications', publicationHandler)
-  .set('PublicationsTrim', publicationHandler);
+  .set('PublicationsTrim', publicationHandler)
+  .set('Detailed views',interactionHandler)
+  .set('Detailed viewsTrim',interactionHandlerTrim);
 
  /**
   * parseMetadata(pair, trim)
@@ -437,6 +450,34 @@ function generateDatabaseList(sortedArray, trim, expansionLink) {
   return h('div.fake-paragraph', [h('div.span-field-name', 'Links :'), renderValue]);
 }
 
+function generateInteractionList(sortedArray, trim, expansionLink) {
+
+  //Ignore Publication references
+  sortedArray = sortedArray.filter(databaseEntry => databaseEntry.database.toUpperCase() !== 'PUBMED');
+
+  //Determine if there is more than one link for a database
+  var hasMultipleIds = _.find(sortedArray, databaseRef => databaseRef.ids.length > 1);
+
+  //Generate list
+  let renderValue = sortedArray.map(item =>  generateIdList(item, trim), this);
+
+   //Append expansion link to render value if one exists
+   if (expansionLink && hasMultipleIds && trim) {
+    renderValue = [renderValue, expansionLink];
+  }
+  
+  else if (expansionLink && hasMultipleIds){
+    renderValue.push(h('li.db-item', expansionLink));
+  }
+
+  //If in expansion mode, append list styling
+  if (!trim) {
+    renderValue = h('div.wrap-text', h('ul.db-list', renderValue));
+  }
+
+
+  return h('div.fake-paragraph', [h('div.span-field-name', 'Detailed Views :'), renderValue]);
+}
 module.exports = {
   parseMetadata,
   noDataWarning,

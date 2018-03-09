@@ -126,10 +126,13 @@ class Interactions extends React.Component {
   }
 
   pathwayLinks(sources){
-    return sources.split(';').map( link => {
-      const splitLink=link.split('/').reverse();
-      return [splitLink[1]==='reactome'? 'reactome': 'Pathway Commons',splitLink[0]];
+    let links = [['Detailed views',[]],['Database IDs',[]]];
+     sources.split(';').forEach( link => {
+      const splitLink=link.split('/');
+      const view = splitLink[2]==='pathwaycommons.org';
+      view ? links[0][1].push(['Pathway Commons',splitLink[4]]) : links[1][1].push(['Reactome',splitLink[4]]);
     });
+    return links;
   }
 
   addInteraction(nodes,edge,sources,network,nodeMap,nodeMetadata){
@@ -150,7 +153,7 @@ class Interactions extends React.Component {
       source: nodes[0],
       target: nodes[1],
       class:interaction ,
-      parsedMetadata:[['Database IDs',sources]]
+      parsedMetadata:sources,
     },classes:interaction});
   }
 
