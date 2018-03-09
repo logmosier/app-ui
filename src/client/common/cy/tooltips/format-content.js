@@ -260,7 +260,7 @@ function sortByDatabaseId(dbArray) {
  * Sample Input : generateIdList({'Reactome' : 'R-HSA-59544'})
  * Sample Output : <div class="fake-spacer"><a class="db-link-single-ref" href="http://identifiers.org/reactome/R-HSA-59544" target="_blank">Reactome</a></div>
  */
-function generateIdList(dbIdObject, trim,options) {
+function generateIdList(dbIdObject, trim, options) {
   //get name and trim ID list to 5 items
   let name = dbIdObject.database;
   let list = dbIdObject.ids;
@@ -275,10 +275,10 @@ function generateIdList(dbIdObject, trim,options) {
 
   //Generate a list or a single link
   if (list.length == 1 && trim) {
-    return generateDBLink(name, list[0], true,options);
+    return generateDBLink(name, list[0], true, options, 0, 1);
   }
   else {
-    return h('li.db-item', h('div.db-name', name + ": "), list.map(data => generateDBLink(name, data, false,options), this));
+    return h('li.db-item', h('div.db-name', name + ": "), list.map((data, index) => generateDBLink(name, data, false,options,index,list.length), this));
   }
 }
 
@@ -292,7 +292,7 @@ function generateIdList(dbIdObject, trim,options) {
  * Sample Input : generateDBLink('Reactome', 'R-HSA-59544', true)
  * Sample Output : <div class="fake-spacer"><a class="db-link-single-ref" href="http://identifiers.org/reactome/R-HSA-59544" target="_blank">Reactome</a></div>
  */
-function generateDBLink(dbName, dbId, isDbVisible,options) {
+function generateDBLink(dbName, dbId, isDbVisible, options,index,length) {
   //Get base url for dbid
   let db = config.databases;
   let className = '';
@@ -305,15 +305,16 @@ function generateDBLink(dbName, dbId, isDbVisible,options) {
   if (isDbVisible) {
     className = '-single-ref';
   }
-  dbId = isDbVisible ? dbName : (options.trimName ? dbId.split('_')[0].replace(/([A-Z])/g, ' $1').trim():dbId);
+  let label = isDbVisible ? dbName : (options.trimName ? 'Interaction '+(index+1):dbId);
+  if(index+1!=length){label+=',';}
 
   //Build reference url
   if (link.length === 1 && link[0][1]) {
     let url = link[0][1] + link[0][2] + dbId;
-    return h('div.fake-spacer', h('a.db-link' + className, { href: url, target: '_blank' }, dbId));
+    return h('div.fake-spacer', h('a.db-link' + className, { href: url, target: '_blank' }, label));
   }
   else {
-    return h('div.db-no-link' + className, dbId);
+    return h('div.db-no-link' + className, label);
   }
 }
 
@@ -430,7 +431,7 @@ function generateDatabaseList(sortedArray, trim, expansionLink,options) {
   var hasMultipleIds = _.find(sortedArray, databaseRef => databaseRef.ids.length > 1);
 
   //Generate list
-  let renderValue = sortedArray.map(item => generateIdList(item, trim,options), this);
+  let renderValue = sortedArray.map((item,index) => [generateIdList(item, trim,options),index+1!=sortedArray.length? h('div.db-link',','):''], this);
 
    //Append expansion link to render value if one exists
    if (expansionLink && hasMultipleIds && trim) {
