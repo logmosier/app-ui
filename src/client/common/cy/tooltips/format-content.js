@@ -32,24 +32,24 @@ const nameHandler = (pair, expansionFunction) => {
 const databaseHandlerTrim = (pair, expansionFunction) => {
   const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, 'more »');
   if (pair[1].length < 1) { return h('div.error'); }
-  return generateDatabaseList(sortByDatabaseId(pair[1]), true, expansionLink);
+  return generateDatabaseList(sortByDatabaseId(pair[1]), true, expansionLink,{label:'Links',trimName:false});
 };
 const databaseHandler = (pair, expansionFunction) => {
   const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, '« less');
   if (pair[1].length < 1) { return h('div.error'); }
-  return generateDatabaseList(sortByDatabaseId(pair[1]), false, expansionLink);
+  return generateDatabaseList(sortByDatabaseId(pair[1]), false, expansionLink,{label:'Links',trimName:false});
 };
 
 //Handle interaction/Detailed views related fields
 const interactionHandlerTrim =(pair, expansionFunction) => {
   const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, 'more »');
   if (pair[1].length < 1) { return h('div.error'); }
-  return generateInteractionList(sortByDatabaseId(pair[1]), true, expansionLink);
+  return generateDatabaseList(sortByDatabaseId(pair[1]), true, expansionLink,{label:'Detailed View', trimName:true});
 };
 const interactionHandler =(pair, expansionFunction) => {
   const expansionLink = h('div.more-link', { onclick: () => expansionFunction(pair[0]) }, '« less');
   if (pair[1].length < 1) { return h('div.error'); }
-  return generateInteractionList(sortByDatabaseId(pair[1]), false, expansionLink);
+  return generateDatabaseList(sortByDatabaseId(pair[1]), false, expansionLink,{label:'Detailed View', trimName:true});
 };
 
 //Handle publication related fields
@@ -260,7 +260,7 @@ function sortByDatabaseId(dbArray) {
  * Sample Input : generateIdList({'Reactome' : 'R-HSA-59544'})
  * Sample Output : <div class="fake-spacer"><a class="db-link-single-ref" href="http://identifiers.org/reactome/R-HSA-59544" target="_blank">Reactome</a></div>
  */
-function generateIdList(dbIdObject, trim) {
+function generateIdList(dbIdObject, trim,options) {
   //get name and trim ID list to 5 items
   let name = dbIdObject.database;
   let list = dbIdObject.ids;
@@ -275,10 +275,10 @@ function generateIdList(dbIdObject, trim) {
 
   //Generate a list or a single link
   if (list.length == 1 && trim) {
-    return generateDBLink(name, list[0], true);
+    return generateDBLink(name, list[0], true,options);
   }
   else {
-    return h('li.db-item', h('div.db-name', name + ": "), list.map(data => generateDBLink(name, data, false), this));
+    return h('li.db-item', h('div.db-name', name + ": "), list.map(data => generateDBLink(name, data, false,options), this));
   }
 }
 
@@ -292,7 +292,7 @@ function generateIdList(dbIdObject, trim) {
  * Sample Input : generateDBLink('Reactome', 'R-HSA-59544', true)
  * Sample Output : <div class="fake-spacer"><a class="db-link-single-ref" href="http://identifiers.org/reactome/R-HSA-59544" target="_blank">Reactome</a></div>
  */
-function generateDBLink(dbName, dbId, isDbVisible) {
+function generateDBLink(dbName, dbId, isDbVisible,options) {
   //Get base url for dbid
   let db = config.databases;
   let className = '';
@@ -305,15 +305,14 @@ function generateDBLink(dbName, dbId, isDbVisible) {
   if (isDbVisible) {
     className = '-single-ref';
   }
+  dbId = isDbVisible ? dbName : (options.trimName ? dbId.split('_')[0].replace(/([A-Z])/g, ' $1').trim():dbId);
 
   //Build reference url
   if (link.length === 1 && link[0][1]) {
     let url = link[0][1] + link[0][2] + dbId;
-    dbId = isDbVisible ? dbName : dbId;
     return h('div.fake-spacer', h('a.db-link' + className, { href: url, target: '_blank' }, dbId));
   }
   else {
-    dbId = isDbVisible ? dbName : dbId;
     return h('div.db-no-link' + className, dbId);
   }
 }
@@ -422,7 +421,7 @@ function publicationList(data) {
  *    </div>
  * </div>
  */
-function generateDatabaseList(sortedArray, trim, expansionLink) {
+function generateDatabaseList(sortedArray, trim, expansionLink,options) {
 
   //Ignore Publication references
   sortedArray = sortedArray.filter(databaseEntry => databaseEntry.database.toUpperCase() !== 'PUBMED');
@@ -431,7 +430,7 @@ function generateDatabaseList(sortedArray, trim, expansionLink) {
   var hasMultipleIds = _.find(sortedArray, databaseRef => databaseRef.ids.length > 1);
 
   //Generate list
-  let renderValue = sortedArray.map(item => generateIdList(item, trim), this);
+  let renderValue = sortedArray.map(item => generateIdList(item, trim,options), this);
 
    //Append expansion link to render value if one exists
    if (expansionLink && hasMultipleIds && trim) {
@@ -446,38 +445,9 @@ function generateDatabaseList(sortedArray, trim, expansionLink) {
     renderValue = h('div.wrap-text', h('ul.db-list', renderValue));
   }
 
-
-  return h('div.fake-paragraph', [h('div.span-field-name', 'Links :'), renderValue]);
+  return h('div.fake-paragraph', [h('div.span-field-name', options.label+' :'), renderValue]);
 }
 
-function generateInteractionList(sortedArray, trim, expansionLink) {
-
-  //Ignore Publication references
-  sortedArray = sortedArray.filter(databaseEntry => databaseEntry.database.toUpperCase() !== 'PUBMED');
-
-  //Determine if there is more than one link for a database
-  var hasMultipleIds = _.find(sortedArray, databaseRef => databaseRef.ids.length > 1);
-
-  //Generate list
-  let renderValue = sortedArray.map(item =>  generateIdList(item, trim), this);
-
-   //Append expansion link to render value if one exists
-   if (expansionLink && hasMultipleIds && trim) {
-    renderValue = [renderValue, expansionLink];
-  }
-  
-  else if (expansionLink && hasMultipleIds){
-    renderValue.push(h('li.db-item', expansionLink));
-  }
-
-  //If in expansion mode, append list styling
-  if (!trim) {
-    renderValue = h('div.wrap-text', h('ul.db-list', renderValue));
-  }
-
-
-  return h('div.fake-paragraph', [h('div.span-field-name', 'Detailed Views :'), renderValue]);
-}
 module.exports = {
   parseMetadata,
   noDataWarning,
