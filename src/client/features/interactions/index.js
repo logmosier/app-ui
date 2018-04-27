@@ -106,8 +106,9 @@ class Interactions extends React.Component {
     this.state.cy.on('trim', () => {
       const state = this.state;
       const ids = state.ids;
+      const cy = state.cy;
+      cy.filter(node=>ids.indexOf(node.data().id)!=-1).data('queried',true);
       if(ids.length === sources.length){
-        const cy = state.cy;
         const mainNode = cy.nodes(node=> ids.indexOf(node.data().id) != -1);
         const nodesToKeep = mainNode.merge(mainNode.connectedEdges().connectedNodes());
         cy.remove(cy.nodes().difference(nodesToKeep));
@@ -171,7 +172,7 @@ class Interactions extends React.Component {
         const metadata=nodeMetadata.get(node);
         nodeMap.set(node,true);
         const links=_.uniqWith(_.flatten(metadata.slice(-2).map(entry => entry.split(';').map(entry=>entry.split(':')))),_.isEqual).filter(entry=>entry[0]!='intact');       
-        network.nodes.push({data:{class: "ball",id: node,label: node, queried: this.state.ids.indexOf(node)!=-1 ,
+        network.nodes.push({data:{class: "ball",id: node,label: node,
         parsedMetadata:[['Type','bp:'+metadata[0].split(' ')[0].replace(/Reference/g,'').replace(/;/g,',')],['Database IDs', links]]}});
       }
     });
